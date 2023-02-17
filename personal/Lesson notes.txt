@@ -23,3 +23,24 @@ it in an async function.
 This pattern is pretty common and worth remembering.
 
 Today, there is a built-in method for this: https://nodejs.org/api/stream.html#stream_streams_promises_api
+
+
+RUNNING FRONT AND BACK END AT THE SAME times
+
+In order to run our application during dev, we have to keep "starting" both, going back and forth, which is not very convenient.
+Instead, what we can do is init npm at the root directory (until now we had just 2 npm projects: client and server) and, in the new package.json, do:
+    "server": "npm run watch --prefix server",
+    "client": "npm start --prefix client",
+    "watch": "npm run server & npm run client",
+
+(--prefix tells npm the directory where you want to execute the command)
+(We only use one "&" because we don't want the first command to finish before executing the second one. The 1st executes in the background WHILE the 2nd runs)
+This way, we can just do npm run watch from the root and start both, the client and the server
+
+We can use this same approach to automate task that requires both client and server (like running tests, install dependencies, etc.)
+
+
+DEPLOYING IN THE SAME SERVER
+Up until now, we have been working on the --code that is gonna create the output code that's gonna see the user--, not the "final code". Our frontend needs to be "built".
+In package.json, we have the "build" command and we can chose to "build" our app in the same port that we are creating the server by doing (in package.json of the client):
+    "build": "BUILD_PATH =..server/public react-scripts build",
