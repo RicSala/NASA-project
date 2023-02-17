@@ -5,7 +5,9 @@
 import http from 'http'
 
 import app from './app.js'
+import { loadPlanetsData } from './models/planets.model.js'
 
+await loadPlanetsData()
 
 const PORT = process.env.PORT || 8000
 

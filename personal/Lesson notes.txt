@@ -1,0 +1,25 @@
+Router - Controller - Model
+
+Model: Defines the objects we are gonna work with ?And gives functions to manipulate them? (export: model)
+
+Controller: Does the real work () (import: model - export functions get, post...)
+
+Router: Groups endpoints by subdirectory, so they can be hadle as independent apps. They are actually a middleware, that we have to add to app.js. (import: controllers - export the router so it can be add to app.js as middleware)
+
+
+* Keep in mind that a controller can make use of several models, and a model can be used in several controllers. However, usually, there is one controllers file for each router.
+
+
+LOAD DATA BEFORE PRESENTING TO THE USER
+
+Many times, we need to load data before presenting it to the user. In this case, it happens with the "planets" collection.
+If we just use the fs.createReadStream, as it happens async, the program will keep runing and the array would be returned to the controller before
+the data has being read and loaded.
+
+To prevent that, we wrap the fs.createReadStream in a function that returns a promise. This promise resolves only when all info has been loaded (and rejects if there is an error)
+Then, in server.js, we import that function and "await" for it to finiss. If we are using ESM, then we can just use await out of any functions. If we are using classic modules, we need to wrap
+it in an async function.
+
+This pattern is pretty common and worth remembering.
+
+Today, there is a built-in method for this: https://nodejs.org/api/stream.html#stream_streams_promises_api
