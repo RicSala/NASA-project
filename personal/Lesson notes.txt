@@ -44,3 +44,33 @@ DEPLOYING IN THE SAME SERVER
 Up until now, we have been working on the --code that is gonna create the output code that's gonna see the user--, not the "final code". Our frontend needs to be "built".
 In package.json, we have the "build" command and we can chose to "build" our app in the same port that we are creating the server by doing (in package.json of the client):
     "build": "BUILD_PATH =..server/public react-scripts build",
+
+
+
+DIAGRAMS: https://www.lucidchart.com/pages/es
+
+
+TESTING
+There should different types of testing at different levels at the application. Like a pyramid having at the bottom the "basic/simple" test that can be automated, and at the top the test that usually
+require human interaction
+Unit test > API Test > Automated UI test > Manual test
+                |
+                |
+    this is what we are talking about
+API test are sometimes called "integration test"
+Testing in Nodejs requires several tools:
+- Test runner: Finds the test, runs through them and gives you the results
+- Test Fixtures: "Environments" for the test, with its own variables and data
+- Assertions: functions that let us say for example what we expect
+- Mocking: mocks allows us to replace certain functionalities when we run our tests (for example to avoid modifying the real database)
+
+Before, we used to need different packages for each tool, today, with Jest, we have all this functionality together (which is indeed used in many other frameworks & languages)
+
+Two ways to organize:
+- One folder name __test__ where all test will be, or...
+- one file alonside any modules you are testing with the name [launches].test.js or [launches].spec.js
+
+TODO :     "test-watch": "jest --watch" --> Check what exactlyis doing this
+
+To run test an API, we need to make calls to an API. That's not directly provide by Jest. We need something like the SuperTest module, that provides Assertions (specific
+to http) that can be used within Jest
