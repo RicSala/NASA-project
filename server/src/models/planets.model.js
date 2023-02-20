@@ -44,9 +44,12 @@ function loadPlanetsData() {
     
 }
 
-    const planets = habitablePlanets
+function getAllPlanets(planets) {
+    return habitablePlanets
+}
+
 
 export {
-    planets,
+    getAllPlanets,
     loadPlanetsData
 }
