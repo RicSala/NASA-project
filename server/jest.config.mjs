@@ -4,4 +4,5 @@ export default {
       "js",
     ],
     testRegex: `test\.js$`,
+    testEnvironment: "node"
   };

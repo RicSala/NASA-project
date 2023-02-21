@@ -1,47 +1,68 @@
-const launches = new Map()
-let latestFlightNumber = 100;
+import launchesMongo from "./launches.mongo.js";
+import planetsMongo from "./planets.mongo.js"; // TODO: Tip: when working in layers (kind of like MVC...) it's usually better to work with a lower layer
+
+const DEFAULT_FLIGHT_NUMBER = 100
 // TODO: Review Map data structures
 
-const launch = {
-    flightNumber: 100,
-    mission: 'Kepler Exploration X',
-    rocket: 'Explorer IS1',
-    launchDate: new Date('December 27, 2030'),
-    target: 'Kepler-442 b',
-    customers: ['ZTM', 'NASA'],
-    upcoming: true,
-    success: true,
+async function getAllLaunches() {
+    return await launchesMongo.find({}, '-_id -__v') 
 }
 
-launches.set(launch.flightNumber, launch)
+async function saveLaunch(launch) {
 
-function getAllLaunches() {
-    return Array.from(launches.values())
+    const planet = await planetsMongo.findOne({
+        keplerName: launch.target,
+    })
+
+    if (!planet) {
+        throw new Error("No matching planet was found")
+    }
+    await launchesMongo.updateOne({
+        flightNumber: launch.flightNumber,
+    }, launch, {
+        upsert: true,
+    })
+
 }
 
-function addNewLaunch(launch) {
+async function getLatesFlightNumber() {
+    const latestLaunch = await launchesMongo.findOne().sort('-flightNumber')
+    if (!latestLaunch) {
+        return DEFAULT_FLIGHT_NUMBER
+    }
     
-    latestFlightNumber++
-    launches.set(latestFlightNumber, Object.assign(launch, {
-        flightNumber: latestFlightNumber,
-        customers: ['ZTM', 'NASA'], 
+    return latestLaunch.flightNumber; //TODO between you get this number and you update the database...it can have changed, right?
+}
+
+
+async function addNewLaunch(launch) {
+    
+    const latestFlightNumber = await getLatesFlightNumber() + 1
+    const newLaunch = Object.assign(launch, {
         upcoming: true,
         success: true,
+        customers: ['ZTM', 'NASA'],
+        flightNumber: latestFlightNumber
+    })
+    saveLaunch(newLaunch)
+}
+
+async function existLaunchWithId(id) {
+    return (await launchesMongo.findOne({
+        flightNumber: id
     }))
 }
 
-function existLaunchWithId(id) {
-    return launches.has(id)
+async function abortLaunchById(id) {
+
+    const aborted = await launchesMongo.updateOne({
+        flightNumber: id
+    }, {
+        upcoming: false,
+        success: false,
+    })
+    return aborted.modifiedCount === 1
 }
-
-function abortLaunchById(id) {
-    const aborted = launches.get(id)
-    aborted.upcoming = false
-    aborted.success = false
-    return aborted
-
-}
-
 
 
 export {

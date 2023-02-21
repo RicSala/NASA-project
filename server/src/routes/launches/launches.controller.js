@@ -1,10 +1,11 @@
 import { getAllLaunches, addNewLaunch, existLaunchWithId, abortLaunchById } from "../../models/launches.model.js";
 
-function httpGetAllLaunches(req, res) {
-    return res.status(200).json(getAllLaunches())
+
+async function httpGetAllLaunches(req, res) {
+    return res.status(200).json( await getAllLaunches())
 }
 
-function httpAddNewLaunch(req, res) {
+async function httpAddNewLaunch(req, res) {
     
     let launch = req.body;
 
@@ -22,23 +23,35 @@ function httpAddNewLaunch(req, res) {
     }
 
 
-    addNewLaunch(launch) 
+    await addNewLaunch(launch) 
 
     return res.status(201).json(launch)
 
 }
 
 
-function httpAbortLaunch(req, res) {
+async function httpAbortLaunch(req, res) {
     const launchId = Number(req.params.id)
+    const existLunch = await existLaunchWithId(launchId)
 
-    if (!existLaunchWithId(launchId)) {
+    if (!existLunch) {
         return res.status(404).json({
             error: "Launch not found"
         })
     }
-    const aborted = abortLaunchById(launchId)
-    return res.status(200).json(aborted)
+    const aborted = await abortLaunchById(launchId)
+    if (!aborted) {
+        return res.status(400).json({
+            error: 'Launch not aborted'
+        })
+    }
+
+    return res.status(200).json({
+        ok: true
+    })
 }
 
 export { httpGetAllLaunches, httpAddNewLaunch, httpAbortLaunch }
+
+
+// BUG  when creating new launches, if I don't refresh the page, it doesn't show the last added launch in the upcoming launches page. Same thing happens when deleting. And same thing in the destionation tab
